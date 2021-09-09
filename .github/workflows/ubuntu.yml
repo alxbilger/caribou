@@ -205,7 +205,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: caribou_${{ matrix.sofa_version }}
-          path: /tmp
 
       - name: Get current date
         id: date
