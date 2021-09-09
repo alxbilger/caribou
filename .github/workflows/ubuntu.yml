@@ -189,3 +189,34 @@ jobs:
         run: |
             export PYTHONPATH=$PYTHONPATH:$CARIBOU_ROOT/lib/python3/site-packages:$SOFA_ROOT/plugins/SofaPython3/lib/python3/site-packages
             python3 $CARIBOU_ROOT/bin/pytest/SofaCaribou_Forcefield_HyperelasticForcefield.py
+
+
+  deploy:
+    name: Deploy ${{ matrix.sofa_version }}
+    needs: [test]
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        sofa_version: [ v20.06.01, v20.12.02, master ]
+
+    steps:
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: caribou_${{ matrix.sofa_version }}
+          path: /tmp
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y_%m_%d')"
+
+      - name: Deploy artifact
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.ARTIFACT_HOST }}
+          username: ${{ secrets.ARTIFACT_USERNAME }}
+          port: ${{ secrets.ARTIFACT_PORT }}
+          key: ${{ secrets.ARTIFACT_KEY }}
+          source: "/tmp/SofaCaribou.tar.gz"
+          target: ${{ format('{0}/linux/{1}/SofaCaribou_{2}.tar.gz', secrets.ARTIFACT_TARGET, matrix.sofa_version, steps.date.outputs.date) }}
