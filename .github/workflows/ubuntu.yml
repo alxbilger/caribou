@@ -220,3 +220,4 @@ jobs:
           key: ${{ secrets.ARTIFACT_KEY }}
           source: "/tmp/SofaCaribou.tar.gz"
           target: ${{ format('{0}/linux/{1}/SofaCaribou_{2}.tar.gz', secrets.ARTIFACT_TARGET, matrix.sofa_version, steps.date.outputs.date) }}
+          debug: true
